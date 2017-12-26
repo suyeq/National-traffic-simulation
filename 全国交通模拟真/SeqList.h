@@ -8,7 +8,7 @@ protected:
 public:
 	SeqList();
 	SeqList(int max);		      			//构造函数
-	~SeqList(void);		      				//析构函数
+	~SeqList();		      				//析构函数
 
 	int Size(void) const;					//取当前数据元素个数
 	void Insert(const T& item, int i);//插入
@@ -40,9 +40,9 @@ SeqList<T>::SeqList(int max)					//构造函数
 	list = new T[maxSize];
 }
 template <class T>
-SeqList<T>::~SeqList(void)						//析构函数
+SeqList<T>::~SeqList()						//析构函数
 {
-	//delete []list;
+	delete []list;
 }
 template <class T>
 int SeqList<T>::Size(void) const			//取当前数据元素个数
