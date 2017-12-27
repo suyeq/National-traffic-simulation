@@ -114,7 +114,10 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="SeqList.h" />
+    <ClInclude Include="Station.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
