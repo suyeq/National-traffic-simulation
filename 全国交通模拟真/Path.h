@@ -1,10 +1,11 @@
+#include"PathTime.h"
 class Path
 {
 private:
 	int start_station;
 	int end_station;
 	double length;
-	double time;
+	PathTime time;
 
 public:
 	Path(){}
@@ -28,17 +29,23 @@ public:
 	{
 		this->length = length;
 	}
-	int getLength()
+	double getLength()
 	{
 		return length;
 	}
-	void setTime(double time)
+	void setTime(PathTime& time)
 	{
 		this->time = time;
 	}
-	int getTime()
+	PathTime& getTime()
 	{
 		return time;
 	}
-
+    PathTime& operator=(PathTime& pathtime) {
+		PathTime a;
+		a.setStart_time(pathtime.getStart_time());
+		a.setEnd_time(pathtime.getEnd_time());
+		a.setSum_time(pathtime.sum());
+		return a;
+	}
 };
