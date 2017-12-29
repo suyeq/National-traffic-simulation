@@ -1,4 +1,5 @@
 #include<iostream>
+#include<fstream>
 #include"SeqList.h"
 #include"Station.h"
 #include"Path.h"
@@ -10,10 +11,8 @@ private:
 	SeqList<Station> list;
 	double Edges[MAXNUM][MAXNUM];
 	SeqList<Path> edges;
-	//int numEdges;
-
 public:
-	Map(int num );
+	Map(int num);
 	~Map() {}
 	int getNumVertexes()
 	{
@@ -31,6 +30,10 @@ public:
 	void deletePath(int start,int end);
 	void station_Show();
 	void path_Show();
+	void fromfileStation();
+	void infileStation();
+	void fromfilePath();
+	void infilePath();
 	friend istream& operator>>(istream &is, Station &station);
 	friend istream& operator>>(istream &is, Path &path);
 };
@@ -84,6 +87,7 @@ void Map::addStation()
 	if (isStation(st))
 	{
 		list.Insert(st, list.Size());
+		infileStation();
 	}
 	else {
 		cout<< "该车站已存在，增加失败!!!" << endl;
@@ -92,7 +96,14 @@ void Map::addStation()
 
 void Map::deleteStation(int i)
 {
-	list.Delete(i);
+	if (i<0 || i>list.Size() - 1) {
+		cout << "该车站不存在!!!" << endl;
+	}
+	else {
+		list.Delete(i);
+		infilePath();
+	}
+	infileStation();
 }
 
 void Map::addPath()
@@ -102,6 +113,7 @@ void Map::addPath()
 	cin >> pa;
 	if (isEdges(pa)){
 		edges.Insert(pa,edges.Size());
+		//infilePath();
 	}
 	else {
 		cout << "该路线已存在，增加失败!!!" << endl;
@@ -119,50 +131,133 @@ void Map::deletePath(int start, int end)
 	}
 	if (isEdges(edges.GetData(temp))) {
 		edges.Delete(temp);
+		//infilePath();
 	}
 	else {
 		cout << "该路线不存在！！" << endl;
 	}
 }
- istream& operator>>(istream &is, Station &station)
+ 
+istream& operator>>(istream &is, Station &station)
 {
-	 string name;
-	 int id;
-	 is >> name >> id;
-	 station.setId(id);
-	 station.setName(name);
-	 return is;
+	string name;
+	int id;
+	is >> name >> id;
+	station.setId(id);
+	station.setName(name);
+	return is;
 }
-
-istream& operator>>(istream& is, Path &path)
+istream& operator>>(istream &is, Path &path)
 {
-	 int start, end;
-	 double length;
-	 string start_time, end_time;
-	 PathTime pathtime;
-	 is >> start >> end >> length >> start_time>>end_time;
-	 pathtime.setStart_time(start_time);
-	 pathtime.setStart_time(end_time);
-	 cout << "123";
-	 system("pause");
-	 pathtime.setSum_time(pathtime.sum());
-	 cout << "234";
-	 system("pause");
-	 path.setStart_station(start);
-	 path.setEnd_station(end);
-	 path.setLength(length);
-	 path.setTime(pathtime);
-	 return is;
+	int start, end;
+	double length;
+	string start_time, end_time;
+	PathTime pathtime;
+	is >> start >> end >> length >> start_time >> end_time;
+	pathtime.setStart_time(start_time);
+	pathtime.setEnd_time(end_time);
+	pathtime.setSum_time(pathtime.sum());
+	path.setTime(pathtime);
+	path.setStart_station(start);
+	path.setEnd_station(end);
+	path.setLength(length);
+	return is;
 }
-
 void Map::station_Show() {
+	fromfileStation();
 	for (int i = 0; i < list.Size(); i++) {
 		cout << list[i].getId() << " ";
 	}
 }
 
 void Map::path_Show() {
+	//fromfilePath();
 	for (int i = 0; i < edges.Size(); i++) {
-		cout << edges[i].getTime().getSum_time() << " ";
+		cout << edges[i].getLength() << " ";
+	}
+}
+
+void Map::fromfileStation() {
+	fstream ifile;
+	ifile.open("Station.txt");
+	if (!ifile)  cout << "源文件丢失！" << endl;
+	else {
+		if (ifile.eof())
+			ifile.get();
+		Station temp;
+		string name;
+		int id;
+		while (!ifile.eof()) {
+			ifile >> name >>id;
+			temp.setId(id);
+			temp.setName(name);
+			list.Insert(temp, list.Size());
+		}
+		ifile.close();
+	}
+}
+
+void  Map::infileStation() {
+	fstream ifile;
+	ifile.open("Station.txt");
+	if (!ifile)  cout << "源文件丢失！" << endl;
+	else {
+	   int i = 0;
+	   while (i<list.Size()) {
+		   if (i == list.Size() - 1) {
+			   ifile << list[i].getName() << " " << list[i].getId();
+			   break;
+		   }
+		   ifile << list[i].getName() << " " << list[i].getId() << endl;
+		   i++;
+		}
+		ifile.close();
+	}
+}
+
+void Map::fromfilePath() {
+	fstream ofile;
+	ofile.open("Path.txt");
+	if (!ofile)  cout << "源文件丢失！" << endl;
+	else {
+		if (ofile.eof())
+			ofile.get();
+		Path path;
+		PathTime pathtime;
+		int start, end;
+		double length;
+		string start_time, end_time;
+		while (!ofile.eof()) {
+			ofile >> start >> end>>length>>start_time>>end_time;
+			pathtime.setStart_time(start_time);
+			pathtime.setEnd_time(end_time);
+			pathtime.setSum_time(pathtime.sum());
+			path.setStart_station(start);
+			path.setEnd_station(end);
+			path.setLength(length);
+			path.setTime(pathtime);
+			edges.Insert(path, edges.Size());
+		}
+		ofile.close();
+	}
+}
+
+void  Map::infilePath() {
+	fstream ofile;
+	ofile.open("Path.txt");
+	if (!ofile)  cout << "源文件丢失！" << endl;
+	else {
+		int i = 0;
+		while (i<edges.Size()) {
+			if (i == edges.Size() - 1) {
+				ofile << edges[i].getStart_station() << " " << edges[i].getEnd_station()<<" "
+					<<edges[i].getLength()<<" "<<edges[i].getTime().getStart_time()<<" "<<edges[i].getTime().getEnd_time();
+				break;
+			}
+			ofile << edges[i].getStart_station() << " " << edges[i].getEnd_station() << " "
+				<< edges[i].getLength() << " " << edges[i].getTime().getStart_time() << " " << edges[i].getTime().getEnd_time()<<endl;
+			i++;
+		}
+		ofile.close();
 	}
 }

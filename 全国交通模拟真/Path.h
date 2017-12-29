@@ -11,7 +11,7 @@ public:
 	Path(){}
 	void setStart_station(int start_station)
 	{
-		this->start_station;
+		this->start_station=start_station;
 	}
 	int getStart_station()
 	{
@@ -41,11 +41,5 @@ public:
 	{
 		return time;
 	}
-    PathTime& operator=(PathTime& pathtime) {
-		PathTime a;
-		a.setStart_time(pathtime.getStart_time());
-		a.setEnd_time(pathtime.getEnd_time());
-		a.setSum_time(pathtime.sum());
-		return a;
-	}
+	
 };

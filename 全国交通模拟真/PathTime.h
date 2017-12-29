@@ -29,21 +29,28 @@ public:
 		this->sum_time = sum_time;
 	}
 	double sum();
+	//PathTime& operator=(PathTime& pathtime);
 };
 double PathTime::sum() {
-	int sum_hours, sum_minute;
-	int hours_start = (start_time[0] - 48) * 10 + start_time[1] - 48;
-	int minute_start = (start_time[3] - 48) * 10 + start_time[4] - 48;
-	int hours_end = (end_time[0] - 48) * 10 + end_time[1] - 48;
-	int minute_end = (end_time[3] - 48) * 10 + end_time[4] - 48;
+	double sum_hours, sum_minute;
+	double hours_start = (start_time[0] - 48) * 10 + start_time[1] - 48;
+	double minute_start = (start_time[3] - 48) * 10 + start_time[4] - 48;
+	double hours_end = (end_time[0] - 48) * 10 + end_time[1] - 48;
+	double minute_end = (end_time[3] - 48) * 10 + end_time[4] - 48;
 	if (minute_end >= minute_start) {
 		sum_minute = minute_end - minute_start;
 		sum_hours = hours_end - hours_start;
 	}
 	else {
-		sum_minute = minute_start - minute_end;
+		sum_minute = minute_end - minute_start+60;
 		sum_hours = hours_end - hours_start-1;
 	}
 	double sum = sum_hours + sum_minute / 60;
 	return sum;
 }
+/*PathTime& PathTime::operator=(PathTime& pathtime) {
+	setStart_time(pathtime.getStart_time());
+	setEnd_time(pathtime.getEnd_time());
+	setSum_time(pathtime.sum());
+	return *this;
+}*/
