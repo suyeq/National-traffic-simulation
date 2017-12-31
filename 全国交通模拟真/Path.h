@@ -1,17 +1,25 @@
-#include"PathTime.h"
+#include"PathNode.h"
 class Path
 {
 private:
 	int start_station;
 	int end_station;
 	double length;
-	PathTime time;
-
+	int trainNumber;
+	SeqList<PathNode> pathnode;
 public:
-	Path(){}
+	Path() {}
+	/*Path& operator=(Path &path) {
+		start_station = path.getStart_station();
+		end_station = path.getEnd_station();
+		length = path.getLength();
+		trainNumber = path.getTrainNumber();
+		pathnode = path.getTrain();
+		return *this;
+	}*/
 	void setStart_station(int start_station)
 	{
-		this->start_station=start_station;
+		this->start_station = start_station;
 	}
 	int getStart_station()
 	{
@@ -33,13 +41,22 @@ public:
 	{
 		return length;
 	}
-	void setTime(PathTime& time)
+	void setTrain(SeqList<PathNode> &node)
 	{
-		this->time = time;
+		pathnode = node;
+		/*for (int i = 0; i < node.Size(); i++){
+			pathnode[i] = node[i];
+		}*/
 	}
-	PathTime& getTime()
+	SeqList<PathNode> getTrain()
 	{
-		return time;
+		return pathnode;
+	}
+	void setTrainNumber(int number) {
+		trainNumber = number;
+	}
+	int getTrainNumber() {
+		return trainNumber;
 	}
 	
 };

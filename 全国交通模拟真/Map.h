@@ -8,12 +8,15 @@
 class Map
 {
 private:
+	Map() {};
+	Map(int num);
+	~Map();
 	SeqList<Station> list;
 	double Edges[MAXNUM][MAXNUM];
 	SeqList<Path> edges;
+	static Map *map;
+
 public:
-	Map(int num);
-	~Map() {}
 	int getNumVertexes()
 	{
 		return list.Size();
@@ -22,6 +25,7 @@ public:
 	{
 		return edges.Size();
 	}
+	static Map* getInstance();
 	bool isStation(Station st);//判断车站是否存在
 	bool isEdges(Path pa);//判断路是否存在
 	void addStation();
@@ -34,9 +38,23 @@ public:
 	void infileStation();
 	void fromfilePath();
 	void infilePath();
+	void voluation_Length();//路程，权值,赋值
+	void voluation_Time();//时间，权值
 	friend istream& operator>>(istream &is, Station &station);
 	friend istream& operator>>(istream &is, Path &path);
+	friend istream& operator>>(istream &is, PathNode &pathnode);
 };
+Map* Map::getInstance() {
+	if (map == NULL) {
+		map = new Map(100);
+	}
+	return map;
+}
+Map::~Map() {
+	if (map != NULL) {
+		delete map;
+	}
+}
 Map::Map(int num )
 {
 	for (int i = 0; i < num; i++)
@@ -58,20 +76,20 @@ bool Map::isStation(Station st)
 {
 	for (int i = 0; i < list.Size(); i++)
 	{
-		if (st.getName()== list[i].getName()||st.getId()==list[i].getId())
-		{
-			return false;
-		}
+      if (st.getName() == list[i].getName() || st.getId() == list[i].getId())
+      {
+		  cout << "wer";
+	    return false;
+       }
 	}
 	return true;
 }
 
 bool Map::isEdges(Path pa)
 {
-	
 	for (int i = 0; i < edges.Size(); i++)
 	{
-		if (pa.getStart_station()== edges[i].getStart_station() && pa.getEnd_station() == edges[i].getEnd_station())
+		if (pa.getStart_station() == edges[i].getStart_station() && pa.getEnd_station() == edges[i].getEnd_station())
 		{
 			return false;
 		}
@@ -87,10 +105,10 @@ void Map::addStation()
 	if (isStation(st))
 	{
 		list.Insert(st, list.Size());
-		infileStation();
+		//infileStation();
 	}
 	else {
-		cout<< "该车站已存在，增加失败!!!" << endl;
+		cout << "该车站已存在，增加失败!!!" << endl;
 	}
 }
 
@@ -109,10 +127,10 @@ void Map::deleteStation(int i)
 void Map::addPath()
 {
 	Path pa;
-	cout << "请输入该路线的起点站，终点站，距离，起始时间，到站时间" << endl;
+	cout << "请输入该路线的起点站，终点站，距离,火车数目" << endl;
 	cin >> pa;
-	if (isEdges(pa)){
-		edges.Insert(pa,edges.Size());
+	if (isEdges(pa)) {
+	edges.Insert(pa, edges.Size());
 		//infilePath();
 	}
 	else {
@@ -123,8 +141,8 @@ void Map::addPath()
 void Map::deletePath(int start, int end)
 {
 	int temp;
-	for(int i = 0; i < edges.Size(); i++) {
-		if (edges[i].getStart_station()==start && edges[i].getEnd_station()==end) {
+	for (int i = 0; i < edges.Size(); i++) {
+		if (edges[i].getStart_station() == start && edges[i].getEnd_station() == end) {
 			temp = i;
 			break;
 		}
@@ -137,7 +155,7 @@ void Map::deletePath(int start, int end)
 		cout << "该路线不存在！！" << endl;
 	}
 }
- 
+
 istream& operator>>(istream &is, Station &station)
 {
 	string name;
@@ -149,20 +167,33 @@ istream& operator>>(istream &is, Station &station)
 }
 istream& operator>>(istream &is, Path &path)
 {
-	int start, end;
+	int start, end, trainnum;
 	double length;
-	string start_time, end_time;
-	PathTime pathtime;
-	is >> start >> end >> length >> start_time >> end_time;
-	pathtime.setStart_time(start_time);
-	pathtime.setEnd_time(end_time);
-	pathtime.setSum_time(pathtime.sum());
-	path.setTime(pathtime);
+	SeqList<PathNode> pathtrain;
+	PathNode pathnode;
+	is >> start >> end >> length >> trainnum;
+	for (int i = 0; i < trainnum; i++) {
+		cin >> pathnode;
+		pathtrain.Insert(pathnode, pathtrain.Size());
+	}
 	path.setStart_station(start);
 	path.setEnd_station(end);
 	path.setLength(length);
+	path.setTrainNumber(trainnum);
+	path.setTrain(pathtrain);
 	return is;
 }
+
+istream& operator>>(istream &is, PathNode& pathnode) {
+	string start_time, end_time, trainname;
+	cout << "请输入火车名，起始时间，到站时间" << endl;
+	is >> trainname >> start_time >> end_time;
+	pathnode.setStart_time(start_time);
+	pathnode.setEnd_time(end_time);
+	pathnode.setTrain_name(trainname);
+	return is;
+}
+
 void Map::station_Show() {
 	fromfileStation();
 	for (int i = 0; i < list.Size(); i++) {
@@ -171,9 +202,12 @@ void Map::station_Show() {
 }
 
 void Map::path_Show() {
-	//fromfilePath();
+	fromfilePath();
 	for (int i = 0; i < edges.Size(); i++) {
-		cout << edges[i].getLength() << " ";
+		for (int j = 0; j < edges[i].getTrainNumber(); j++) {
+			cout << edges[i].getTrain()[j].getStart_time() << " ";
+		}
+		
 	}
 }
 
@@ -223,19 +257,26 @@ void Map::fromfilePath() {
 		if (ofile.eof())
 			ofile.get();
 		Path path;
-		PathTime pathtime;
-		int start, end;
+		PathNode pathnode;
+		SeqList<PathNode> seqlist;
+		int start, end,trainnum;
 		double length;
-		string start_time, end_time;
+		string start_time, end_time,train_name;
 		while (!ofile.eof()) {
-			ofile >> start >> end>>length>>start_time>>end_time;
-			pathtime.setStart_time(start_time);
-			pathtime.setEnd_time(end_time);
-			pathtime.setSum_time(pathtime.sum());
+			ofile >> start >> end >> length >> trainnum;
+			for (int i = 0; i < trainnum; i++) {
+				ofile >> train_name >> start_time >> end_time;
+				pathnode.setStart_time(start_time);
+				pathnode.setEnd_time(end_time);
+				pathnode.setTrain_name(train_name);
+				pathnode.setSum_time(pathnode.sum());
+				seqlist.Insert(pathnode, seqlist.Size());
+			}
 			path.setStart_station(start);
 			path.setEnd_station(end);
 			path.setLength(length);
-			path.setTime(pathtime);
+			path.setTrainNumber(trainnum);
+			path.setTrain(seqlist);
 			edges.Insert(path, edges.Size());
 		}
 		ofile.close();
@@ -251,13 +292,35 @@ void  Map::infilePath() {
 		while (i<edges.Size()) {
 			if (i == edges.Size() - 1) {
 				ofile << edges[i].getStart_station() << " " << edges[i].getEnd_station()<<" "
-					<<edges[i].getLength()<<" "<<edges[i].getTime().getStart_time()<<" "<<edges[i].getTime().getEnd_time();
+					<<edges[i].getLength()<<" "<<edges[i].getTrainNumber()<<" ";
+				for (int j= 0; j < edges[i].getTrainNumber(); j++) {
+					ofile << edges[i].getTrain()[j].getTrain_name() << " "
+						<< edges[i].getTrain()[j].getStart_time() << " "
+						<< edges[i].getTrain()[j].getEnd_time();
+				}
 				break;
 			}
 			ofile << edges[i].getStart_station() << " " << edges[i].getEnd_station() << " "
-				<< edges[i].getLength() << " " << edges[i].getTime().getStart_time() << " " << edges[i].getTime().getEnd_time()<<endl;
+				<< edges[i].getLength() << " " << edges[i].getTrainNumber() << " ";
+			for (int j = 0; j < edges[i].getTrainNumber(); j++) {
+				ofile << edges[i].getTrain()[j].getTrain_name() << " "
+					<< edges[i].getTrain()[j].getStart_time() << " "
+					<< edges[i].getTrain()[j].getEnd_time() << endl;
+			}
 			i++;
 		}
 		ofile.close();
 	}
+}
+
+void Map::voluation_Length() {
+	//for (int i = 0; i < edges.Size(); i++) {
+	//	Edges[edges[i].getStart_station()][edges[i].getEnd_station()] = edges[i].getLength();
+	//}
+}
+
+void Map::voluation_Time() {
+	//for (int i = 0; i < edges.Size(); i++) {
+	//	Edges[edges[i].getStart_station()][edges[i].getEnd_station()] = edges[i].getTime().getSum_time();
+	//}
 }

@@ -1,15 +1,15 @@
 #include<iostream>
 #include<string>
 using namespace std;
-class PathTime
+class PathNode
 {
 private:
+	string train_name;
 	string start_time;
 	string end_time;
 	double sum_time;
-
 public:
-	PathTime(){}
+	PathNode(){}
 	string getStart_time() {
 		return start_time;
 	}
@@ -28,10 +28,16 @@ public:
 	void setSum_time(double sum_time) {
 		this->sum_time = sum_time;
 	}
+	void setTrain_name(string train_name) {
+		this->train_name = train_name;
+	}
+	string getTrain_name() {
+		return train_name;
+	}
 	double sum();
-	//PathTime& operator=(PathTime& pathtime);
+	//PathNode& operator=(PathNode& pathtime);
 };
-double PathTime::sum() {
+double PathNode::sum() {
 	double sum_hours, sum_minute;
 	double hours_start = (start_time[0] - 48) * 10 + start_time[1] - 48;
 	double minute_start = (start_time[3] - 48) * 10 + start_time[4] - 48;
@@ -48,7 +54,7 @@ double PathTime::sum() {
 	double sum = sum_hours + sum_minute / 60;
 	return sum;
 }
-/*PathTime& PathTime::operator=(PathTime& pathtime) {
+/*PathNode& PathNode::operator=(PathNode& pathtime) {
 	setStart_time(pathtime.getStart_time());
 	setEnd_time(pathtime.getEnd_time());
 	setSum_time(pathtime.sum());

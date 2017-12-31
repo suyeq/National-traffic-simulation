@@ -116,7 +116,7 @@
   <ItemGroup>
     <ClInclude Include="Map.h" />
     <ClInclude Include="Path.h" />
-    <ClInclude Include="PathTime.h" />
+    <ClInclude Include="PathNode.h" />
     <ClInclude Include="SeqList.h" />
     <ClInclude Include="Station.h" />
   </ItemGroup>

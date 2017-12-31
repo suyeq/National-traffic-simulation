@@ -11,10 +11,11 @@ public:
 	~SeqList();		      				//析构函数
 
 	int Size(void) const;					//取当前数据元素个数
-	void Insert(const T& item, int i);//插入
+	void Insert(const T item, int i);//插入
 	T Delete(const int i);			//删除
 	T & GetData(int i)const;			//取数据元素
 	T &operator [](int i);           //重载[]
+	//SeqList<T>& operator=(const SeqList<T>& temp);
 };
 template <class T>
 T &SeqList<T>::operator[](int i) {
@@ -42,16 +43,17 @@ SeqList<T>::SeqList(int max)					//构造函数
 template <class T>
 SeqList<T>::~SeqList()						//析构函数
 {
-	delete []list;
+	//delete []list;
 }
 template <class T>
 int SeqList<T>::Size(void) const			//取当前数据元素个数
 {
 	return size;
 }
+
 template <class T>
-void SeqList<T>::Insert(const T& item, int i)	//插入
-												//在指定位置i前插入一个数据元素item
+void SeqList<T>::Insert(const T item, int i)	//插入
+											//在指定位置i前插入一个数据元素item
 {
 	if (size == maxSize)
 	{
@@ -66,9 +68,8 @@ void SeqList<T>::Insert(const T& item, int i)	//插入
 
 	//从size-1至i逐个元素后移
 	for (int j = size; j > i; j--) list[j] = list[j - 1];
-
-	list[i] = item;						//在i位置插入item	
-	size++;								//当前元素个数加1
+	list[i] = item;	                  //在i位置插入item	
+	size++;		//当前元素个数加1
 }
 template <class T>
 T SeqList<T>::Delete(const int i)				//删除
@@ -104,4 +105,14 @@ T & SeqList<T>::GetData(int i) const	//取数据元素
 	}
 	return list[i];						//返回取到的元素
 }
-
+/*template<class T>
+SeqList<T>& SeqList<T>:: operator=(const SeqList<T>& temp) {//深拷贝
+	if (this == &temp)
+		return *this;
+	delete[] list;
+	list = new T[100];
+	for (int i = 0; i < temp.Size(); i++) {
+		list[i] = temp[i];
+	}
+	return *this;
+}*/
