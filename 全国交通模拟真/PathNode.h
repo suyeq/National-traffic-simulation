@@ -35,7 +35,6 @@ public:
 		return train_name;
 	}
 	double sum();
-	//PathNode& operator=(PathNode& pathtime);
 };
 double PathNode::sum() {
 	double sum_hours, sum_minute;
@@ -54,9 +53,4 @@ double PathNode::sum() {
 	double sum = sum_hours + sum_minute / 60;
 	return sum;
 }
-/*PathNode& PathNode::operator=(PathNode& pathtime) {
-	setStart_time(pathtime.getStart_time());
-	setEnd_time(pathtime.getEnd_time());
-	setSum_time(pathtime.sum());
-	return *this;
-}*/
+

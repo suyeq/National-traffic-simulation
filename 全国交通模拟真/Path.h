@@ -9,14 +9,6 @@ private:
 	SeqList<PathNode> pathnode;
 public:
 	Path() {}
-	/*Path& operator=(Path &path) {
-		start_station = path.getStart_station();
-		end_station = path.getEnd_station();
-		length = path.getLength();
-		trainNumber = path.getTrainNumber();
-		pathnode = path.getTrain();
-		return *this;
-	}*/
 	void setStart_station(int start_station)
 	{
 		this->start_station = start_station;
@@ -44,11 +36,8 @@ public:
 	void setTrain(SeqList<PathNode> &node)
 	{
 		pathnode = node;
-		/*for (int i = 0; i < node.Size(); i++){
-			pathnode[i] = node[i];
-		}*/
 	}
-	SeqList<PathNode> getTrain()
+	SeqList<PathNode>& getTrain()
 	{
 		return pathnode;
 	}
@@ -58,5 +47,12 @@ public:
 	int getTrainNumber() {
 		return trainNumber;
 	}
-	
+	/*Path& operator=(Path &path) {
+		start_station = path.getStart_station();
+		end_station = path.getEnd_station();
+		length = path.getLength();
+		trainNumber = path.getTrainNumber();
+		pathnode = path.getTrain();
+		return *this;
+	}*/
 };
