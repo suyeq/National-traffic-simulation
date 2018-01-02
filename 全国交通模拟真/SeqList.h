@@ -13,7 +13,7 @@ public:
 
 	int Size(void) const;					//取当前数据元素个数
 	void Insert( T item, int i);//插入
-	T Delete(const int i);			//删除
+	void Delete(const int i);			//删除
 	T & GetData(int i)const;			//取数据元素
 	T &operator [](int i);           //重载[]
 	void Cleardate();//清空
@@ -74,7 +74,7 @@ void SeqList<T>::Insert(T item, int i)	//插入
 	size++;		//当前元素个数加1
 }
 template <class T>
-T SeqList<T>::Delete(const int i)				//删除
+void SeqList<T>::Delete(const int i)				//删除
 												//删除指定位置i的数据元素，删除的元素由函数返回
 {
 	if (size == 0)
@@ -88,13 +88,14 @@ T SeqList<T>::Delete(const int i)				//删除
 		exit(0);
 	}
 
-	T x = list[i];				//取到要删除的元素
-
-								//从i+1至size-1逐个元素前移
-	for (int j = i; j < size - 1; j++) list[j] = list[j + 1];
-
+	//T x = list[i];				//取到要删除的元素
+	//从i+1至size-1逐个元素前移
+	for (int j = i; j < size - 1; j++)
+	{
+		list[j] = list[j + 1];
+	}
 	size--;								//当前元素个数减1
-	return x;							//返回删除的元素
+	//return x;							//返回删除的元素
 }
 template <class T>
 T & SeqList<T>::GetData(int i) const	//取数据元素

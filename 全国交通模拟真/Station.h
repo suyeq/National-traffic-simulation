@@ -7,7 +7,7 @@ class Station
 private:
 string name;
 int id;
-
+string introduce;
 public:
 	Station(){}
 	Station(string name,int id):name(name),id(id){}
@@ -27,5 +27,10 @@ public:
 	{
 		return id;
 	}
-
+	void setIntroduce(string introduce) {
+		this->introduce = introduce;
+	}
+	string getIntroduce() {
+		return introduce;
+	}
 };
