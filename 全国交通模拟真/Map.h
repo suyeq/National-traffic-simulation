@@ -1,3 +1,4 @@
+#pragma once
 #include<iostream>
 #include<fstream>
 #include"SeqList.h"
@@ -42,7 +43,7 @@ public:
 	void voluation_Time();//时间，权值
 	friend istream& operator>>(istream &is, Station &station);
 	friend istream& operator>>(istream &is, Path &path);
-	friend istream& operator>>(istream &is, PathNode &pathnode);
+	friend istream& operator>>(istream &is, PathTrain &pathnode);
 };
 Map* Map::getInstance() {
 	if (map == NULL) {
@@ -169,8 +170,8 @@ istream& operator>>(istream &is, Path &path)
 {
 	int start, end, trainnum;
 	double length;
-	SeqList<PathNode> pathtrain;
-	PathNode pathnode;
+	SeqList<PathTrain> pathtrain;
+	PathTrain pathnode;
 	is >> start >> end >> length >> trainnum;
 	for (int i = 0; i < trainnum; i++) {
 		cin >> pathnode;
@@ -184,7 +185,7 @@ istream& operator>>(istream &is, Path &path)
 	return is;
 }
 
-istream& operator>>(istream &is, PathNode& pathnode) {
+istream& operator>>(istream &is, PathTrain& pathnode) {
 	string start_time, end_time, trainname;
 	cout << "请输入火车名，起始时间，到站时间" << endl;
 	is >> trainname >> start_time >> end_time;
@@ -261,13 +262,13 @@ void Map::fromfilePath() {
 		if (ofile.eof())
 			ofile.get();
 		Path path;
-		PathNode pathnode;
+		PathTrain pathnode;
 		int start, end,trainnum;
 		double length;
 		string start_time, end_time,train_name;
 		while (!ofile.eof()) {
 			ofile >> start >> end >> length >> trainnum;
-			SeqList<PathNode> seqlist;
+			SeqList<PathTrain> seqlist;
 			for (int i = 0; i < trainnum; i++) {
 				ofile >> train_name >> start_time >> end_time;
 				pathnode.setStart_time(start_time);
@@ -282,7 +283,7 @@ void Map::fromfilePath() {
 			path.setTrainNumber(trainnum);
 			path.setTrain(seqlist);
 			edges.Insert(path, edges.Size());
-			seqlist.Cleardate();
+			//seqlist.Cleardate();
 		}
 		ofile.close();
 	}

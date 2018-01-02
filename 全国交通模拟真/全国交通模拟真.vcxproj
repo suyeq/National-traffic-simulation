@@ -116,9 +116,10 @@
   <ItemGroup>
     <ClInclude Include="Map.h" />
     <ClInclude Include="Path.h" />
-    <ClInclude Include="PathNode.h" />
+    <ClInclude Include="PathTrain.h" />
     <ClInclude Include="SeqList.h" />
     <ClInclude Include="Station.h" />
+    <ClInclude Include="Traffic_Control.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,5 @@
-#include"PathNode.h"
+#pragma once
+#include"PathTrain.h"
 class Path
 {
 private:
@@ -6,7 +7,7 @@ private:
 	int end_station;
 	double length;
 	int trainNumber;
-	SeqList<PathNode> pathnode;
+	SeqList<PathTrain> pathnode;
 public:
 	Path() {}
 	void setStart_station(int start_station)
@@ -33,11 +34,11 @@ public:
 	{
 		return length;
 	}
-	void setTrain(SeqList<PathNode> &node)
+	void setTrain(SeqList<PathTrain> &node)
 	{
 		pathnode = node;
 	}
-	SeqList<PathNode>& getTrain()
+	SeqList<PathTrain>& getTrain()
 	{
 		return pathnode;
 	}

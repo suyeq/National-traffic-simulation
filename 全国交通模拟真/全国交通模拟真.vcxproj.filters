@@ -32,7 +32,10 @@
     <ClInclude Include="Path.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PathNode.h">
+    <ClInclude Include="Traffic_Control.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PathTrain.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

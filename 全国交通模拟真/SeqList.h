@@ -1,3 +1,4 @@
+#pragma once
 template <class T>
 class SeqList
 {
@@ -15,7 +16,7 @@ public:
 	T Delete(const int i);			//删除
 	T & GetData(int i)const;			//取数据元素
 	T &operator [](int i);           //重载[]
-	void Cleardate();
+	void Cleardate();//清空
 	SeqList<T>& operator=(SeqList<T>& temp);
 };
 template <class T>
