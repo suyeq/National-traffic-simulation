@@ -118,6 +118,7 @@
     <ClInclude Include="Path.h" />
     <ClInclude Include="PathTrain.h" />
     <ClInclude Include="SeqList.h" />
+    <ClInclude Include="Stack.h" />
     <ClInclude Include="Station.h" />
     <ClInclude Include="Traffic_Control.h" />
     <ClInclude Include="VisitorMessage.h" />

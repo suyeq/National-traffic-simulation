@@ -8,6 +8,7 @@ void Manage(Map *map);
 void DeleteStation(Map *map);
 void DeletePath(Map *map);
 void Message_control(Map *map);
+void Path_short(Map *map);
 void mainLoop()
 {
 	
@@ -21,7 +22,7 @@ void mainLoop()
 		switch (choice)
 		{
 		case 1:map->station_Show(); break;
-		case 2:(*map).station_Show(); break;
+		case 2:Path_short(map); break;
 		case 3:(*map).station_Show(); break;
 		case 4:(*map).station_Show(); break;
 		case 5:Message_control(map); break;
@@ -111,3 +112,12 @@ void Message_control(Map *map) {
 	case 2:map->addMessage(); break;
 	}
 }
+void Path_short(Map *map) {
+	map->voluation_Length();
+	map->Short_Floyd();
+	cout << "请输入要查询的两座城市：";
+	string name1, name2;
+	cin >> name1 >> name2;
+	map->show_ShortPath(name1,name2);
+}
+ 

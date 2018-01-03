@@ -5,10 +5,11 @@
 #include <cstdlib>
 #include"SeqList.h"
 #include"Station.h"
+#include"Stack.h"
 #include"VisitorMessage.h"
 #include"Path.h"
 #define MAXNUM 100
-#define IPOSSIBLE_NUM -1
+#define IPOSSIBLE_NUM 9999999
 class Map
 {
 private:
@@ -19,6 +20,10 @@ private:
 	SeqList<Path> edges;
 	SeqList<Visitor> visitors;
 	double Edges[MAXNUM][MAXNUM];
+	bool visited[MAXNUM];
+	Stack<Station> stack;
+	int ShortPath[MAXNUM][MAXNUM];
+	double ShortPathnum[MAXNUM][MAXNUM];
 	static Map *map;
 
 public:
@@ -50,7 +55,13 @@ public:
 	void infileMessage();
 	void voluation_Length();//路程，权值,赋值
 	void voluation_Time();//时间，权值
+	void voluation_visited();
+	void DFS(int start,int end);
+	void Path_All();
+	void  Short_Floyd();
+	void show_ShortPath(string name1,string name2);
 	int toId(string name);//将名字转换为对应的城市id
+	string toName(int id);
 	friend istream& operator>>(istream &is, Station &station);
 	friend istream& operator>>(istream &is, Visitor &visitor);
 	friend istream& operator>>(istream &is, PathTrain &pathnode);
@@ -59,6 +70,10 @@ Map* Map::getInstance() {
 	if (map == NULL) {
 		map = new Map(100);
 	}
+	map->fromfileStation();
+	map->fromfilePath();
+	map->fromfileMessage();
+	map->voluation_visited();
 	return map;
 }
 Map::~Map() {
@@ -79,6 +94,16 @@ Map::Map(int num)
 			else {
 				Edges[i][j] = IPOSSIBLE_NUM;
 			}
+		}
+	}
+	for (int i = 0; i < MAXNUM; i++) {
+		for (int j = 0; j < MAXNUM; j++) {
+			ShortPathnum[i][j] = 0;
+		}
+	}
+	for (int i = 0; i < MAXNUM; i++) {
+		for (int j = 0; j < MAXNUM; j++) {
+			ShortPath[i][j] = 0;
 		}
 	}
 }
@@ -405,12 +430,11 @@ void  Map::infileMessage() {
 }
 void Map::voluation_Length() {
 	for (int i = 0; i < edges.Size(); i++) {
-		Edges[edges[i].getStart_station()][edges[i].getEnd_station()] = edges[i].getLength();
+		Edges[edges[i].getStart_station()-1][edges[i].getEnd_station()-1] = edges[i].getLength();
 	}
 }
 
 void Map::voluation_Time() {
-	
 	for (int i = 0; i < edges.Size(); i++) {
 		double sumtime=edges[i].getTrain()[0].getSum_time();
 		for (int j = 0; j < edges[i].getTrainNumber(); j++) {
@@ -422,16 +446,93 @@ void Map::voluation_Time() {
 	}
 
 }
+
+void Map::voluation_visited() {
+	for (int i = 0; i < list.Size(); i++) {
+		visited[i] = false;
+	}
+}
+
 int Map::toId(string name) {
 	for (int i = 0; i < list.Size(); i++) {
 		if (list[i].getName() == name) {
 			return i;
 		}
 	}
-	return IPOSSIBLE_NUM;
+	return -1;
+}
+string Map::toName(int id) {
+	for (int i = 0; i < list.Size(); i++) {
+		if (list[i].getId() == (id+1)) {
+			return list[i].getName();
+		}
+	}
+	return NULL;
 }
 
 SeqList<Visitor> Map::getList()
 {
 	return visitors;
+}
+
+void Map::Path_All()
+{
+	cout << "请输入要查询的两座城市：";
+	string name1, name2;
+	cin >> name1 >> name2;
+	
+}
+
+void Map::DFS(int start,int end)
+{
+	visited[start] = true;
+	stack.Push(list[start]);
+	int flag = 0;
+	for (int j = 0; j < list.Size(); j++) {
+		if (j== end) {
+			for (int i; i < stack.Size(); i++) {
+				cout << stack.Pop().getName() << "-->";
+			}
+			break;
+		}
+		if ((Edges[j][end] > 0&& Edges[j][end]<100) && !visited[j]) {
+			DFS(j,end);
+			flag = 1;
+		}
+		if (j == list.Size() - 1 && flag == 0) {
+		    stack.Pop();
+		}
+	}
+}
+
+void Map::Short_Floyd()
+{
+	for (int i = 0; i < list.Size(); i++){
+		for (int j = 0; j < list.Size(); j++){
+			ShortPathnum[i][j] = Edges[i][j];
+			ShortPath[i][j] = j;
+		}
+	}
+	for (int i = 0; i < list.Size(); ++i){
+		for (int j = 0; j < list.Size(); ++j){
+			for (int k = 0; k < list.Size(); ++k){
+				if(ShortPathnum[j][k] > (ShortPathnum[j][i] + ShortPathnum[i][k])) {
+					ShortPathnum[j][k] = ShortPathnum[j][i] + ShortPathnum[i][k];
+					ShortPath[j][k] = ShortPath[j][i];
+				}
+			}
+		}
+	}
+}
+void Map::show_ShortPath(string name1,string name2) {//找完需重新赋值
+	        int i = toId(name1);
+			int j = toId(name2);
+			cout << name1<< "--" << name2 << "    用时/距离为：" << ShortPathnum[i][j]<<endl;
+			int k = ShortPath[i][j];
+			cout << "path:" << name1;
+			while (k!= j) {
+				cout << "-->" <<toName(k);
+				k = ShortPath[k][j];
+			}
+			cout << "-->" << name2 << endl;
 }

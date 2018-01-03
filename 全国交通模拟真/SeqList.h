@@ -55,7 +55,7 @@ int SeqList<T>::Size(void) const			//取当前数据元素个数
 
 template <class T>
 void SeqList<T>::Insert(T item, int i)	//插入
-											//在指定位置i前插入一个数据元素item
+										//在指定位置i前插入一个数据元素item
 {
 	if (size == maxSize)
 	{
