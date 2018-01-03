@@ -38,5 +38,8 @@
     <ClInclude Include="PathTrain.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="VisitorMessage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

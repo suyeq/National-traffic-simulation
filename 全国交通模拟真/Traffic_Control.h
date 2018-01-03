@@ -7,37 +7,28 @@ bool Enter();
 void Manage(Map *map);
 void DeleteStation(Map *map);
 void DeletePath(Map *map);
+void Message_control(Map *map);
 void mainLoop()
 {
-	//Enter()
+	
 	Map *map = Map::getInstance();
-	(*map).station_Show();
-	(*map).path_Show();
-	Manage(map);
-	//
-	//(*map).addStation();
-	//(*map).station_Show();
-	/*system("pause");
-	(*map).path_Show();
-	//system("pause");
-	//(*map).fromfilePath();
-	//
-	//(*map).station_Show();
-	//cout << endl;
-	//(*map).addStation();
-	//map.fromfileStation();
-	//(*map).station_Show();
-	//for (int i = 0; i < 3; i++) {
-	//map.addPath();
-	(*map).addPath();
-	//}
-	//(*map).infilePath();
-	//(*map).infilePath();
-	//(*map).path_Show();
-	system("pause");*/
-	//Menu();
-	//cout<<Enter();
-	system("pause");
+	while (true)
+	{
+		Menu();
+		int choice;
+		cout << "请输入你的选择:";
+		cin >> choice;
+		switch (choice)
+		{
+		case 1:map->station_Show(); break;
+		case 2:(*map).station_Show(); break;
+		case 3:(*map).station_Show(); break;
+		case 4:(*map).station_Show(); break;
+		case 5:Message_control(map); break;
+		case 6:Manage(map); break;
+		case 0:exit(0);
+		}
+	}
 }
 
 void Menu()//菜单
@@ -80,18 +71,20 @@ void Manage(Map *map)//管理员操作
 		cout << "              3、增加路线" << endl;
 		cout << "              4、删除路线" << endl;
 		cout << "              5、增加交通工具" << endl;
+	//	cout << "              6、增加留言" << endl;
 		cout << "              0、退出系统" << endl;
 		cout << " —————————————————————" << endl;
 		int choice;
 		cout << "请输入你的选择:" << endl;
 		cin >> choice;
 		switch (choice) {
-		case 1:(*map).addStation(); break;
+		case 1:map->addStation(); break;
 		case 2:DeleteStation(map); break;
-		case 3:(*map).addPath(); break;
+		case 3:map->addPath(); break;
 		case 4:DeletePath(map); break;
 		case 5:break;
-		case 0:exit(0);
+	//	case 6:(*map).addMessage();
+		case 0:break;
 		default:break;
 		}
 	}
@@ -100,11 +93,21 @@ void DeleteStation(Map *map) {
 	cout << "请输入要删除的城市名字:";
 	string choice;
 	cin >> choice;
-	(*map).deleteStation((*map).toId(choice));
+	map->deleteStation(map->toId(choice));
 }
 void DeletePath(Map *map) {
 	cout << "请输入该路线链接的两座城市名字:";
 	string name1, name2;
 	cin >> name1 >> name2;
-	(*map).deletePath((*map).toId(name1), (*map).toId(name2));
+	map->deletePath(map->toId(name1), map->toId(name2));
+}
+void Message_control(Map *map) {
+	cout << "1.查看留言栏 " << "2.留言" << endl;
+	cout << "请选择以上操作:";
+	int choice;
+	cin >> choice;
+	switch (choice) {
+	case 1:map->Message_Show(); break;
+	case 2:map->addMessage(); break;
+	}
 }

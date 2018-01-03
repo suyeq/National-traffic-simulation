@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include"SeqList.h"
 #include"Station.h"
+#include"VisitorMessage.h"
 #include"Path.h"
 #define MAXNUM 100
 #define IPOSSIBLE_NUM -1
@@ -15,8 +16,9 @@ private:
 	Map(int num);
 	~Map();
 	SeqList<Station> list;
-	double Edges[MAXNUM][MAXNUM];
 	SeqList<Path> edges;
+	SeqList<Visitor> visitors;
+	double Edges[MAXNUM][MAXNUM];
 	static Map *map;
 
 public:
@@ -29,39 +31,42 @@ public:
 		return edges.Size();
 	}
 	static Map* getInstance();
+	SeqList<Visitor> getList();
 	bool isStation(Station st);//判断车站是否存在
 	bool isEdges(Path pa);//判断路是否存在
 	void addStation();
 	void deleteStation(int i);
 	void addPath();
 	void deletePath(int start,int end);
+	void addMessage();
+	void Message_Show();
 	void station_Show();
 	void path_Show();
 	void fromfileStation();
 	void infileStation();
 	void fromfilePath();
 	void infilePath();
+	void fromfileMessage();
+	void infileMessage();
 	void voluation_Length();//路程，权值,赋值
 	void voluation_Time();//时间，权值
 	int toId(string name);//将名字转换为对应的城市id
 	friend istream& operator>>(istream &is, Station &station);
-	friend istream& operator>>(istream &is, Path &path);
+	friend istream& operator>>(istream &is, Visitor &visitor);
 	friend istream& operator>>(istream &is, PathTrain &pathnode);
 };
 Map* Map::getInstance() {
 	if (map == NULL) {
 		map = new Map(100);
-		cout << "get";
 	}
 	return map;
 }
 Map::~Map() {
-	cout << "删除！！";
 	if (map != NULL) {
 		delete map;
 	}
 }
-Map::Map(int num )
+Map::Map(int num)
 {
 	for (int i = 0; i < num; i++)
 	{
@@ -84,7 +89,6 @@ bool Map::isStation(Station st)
 	{
       if (st.getName() == list[i].getName() || st.getId() == list[i].getId())
       {
-		  cout << "wer";
 	    return false;
        }
 	}
@@ -134,24 +138,39 @@ void Map::deleteStation(int i)
 
 void Map::addPath()
 {
-	Path pa;
+	Path path;
 	cout << "请输入该路线的起点站名字，终点站名字，距离,火车数目" << endl;
-	cin >> pa;
-	if (isEdges(pa)) {
-	edges.Insert(pa, edges.Size());
+	//cin >> pa;
+	string start, end;
+	int trainnum;
+	double length;
+	SeqList<PathTrain> pathtrain;
+	PathTrain pathnode;
+	cin >> start >> end >> length >> trainnum;
+for (int i = 0; i < trainnum; i++) {
+	cin >> pathnode;
+	pathtrain.Insert(pathnode, pathtrain.Size());
+}
+ path.setStart_station(toId(start) + 1);
+ path.setEnd_station(toId(end) + 1);
+ path.setLength(length);
+ path.setTrainNumber(trainnum);
+ path.setTrain(pathtrain);
+if (isEdges(path)) {
+	edges.Insert(path, edges.Size());
 	cout << "增加成功！！！" << endl;
-		infilePath();
-	}
-	else {
-		cout << "该路线已存在，增加失败!!!" << endl;
-	}
+	infilePath();
+}
+else {
+	cout << "该路线已存在，增加失败!!!" << endl;
+}
 }
 
 void Map::deletePath(int start, int end)
 {
 	int temp;
 	for (int i = 0; i < edges.Size(); i++) {
-		if (edges[i].getStart_station() == (start+1)&& edges[i].getEnd_station() == (end+1)) {
+		if (edges[i].getStart_station() == (start + 1) && edges[i].getEnd_station() == (end + 1)) {
 			temp = i;
 			break;
 		}
@@ -165,36 +184,32 @@ void Map::deletePath(int start, int end)
 		cout << "该路线不存在！！" << endl;
 	}
 }
-
+void Map::addMessage()
+{
+	Visitor visitor;
+	cout << "请输入游客id，要留言的城市，游客的留言：";
+	cin >> visitor;
+	visitors.Insert(visitor, visitors.Size());
+	infileMessage();
+	cout << "增加成功！！！"<<endl;
+}
 istream& operator>>(istream &is, Station &station)
 {
-	string name,introduce;
+	string name, introduce;
 	int id;
-	is >> name >> id>>introduce;
+	is >> name >> id >> introduce;
 	station.setId(id);
 	station.setName(name);
 	station.setIntroduce(introduce);
 	return is;
 }
-istream& operator>>(istream &is, Path &path)
+istream& operator>>(istream &is, Visitor &visitor)
 {
-	string start, end;
-	int trainnum;
-	double length;
-	SeqList<PathTrain> pathtrain;
-	PathTrain pathnode;
-	//Map *map = Map::getInstance();
-	is >> start >> end >> length >> trainnum;
-	for (int i = 0; i < trainnum; i++) {
-		cin >> pathnode;
-		pathtrain.Insert(pathnode, pathtrain.Size());
-	}
-	path.setStart_station((*map).toId(start));
-	path.setEnd_station((*map).toId(start));
-	path.setLength(length);
-	path.setTrainNumber(trainnum);
-	path.setTrain(pathtrain);
-	//delete map;
+	string name, stationName, message;
+	is >> name >> stationName >> message;
+	visitor.setName(name);
+	visitor.setStationName(stationName);
+	visitor.setMessage(message);
 	return is;
 }
 
@@ -212,25 +227,33 @@ void Map::station_Show() {
 	fromfileStation();
 	cout << "城市名字" << " " << "城市代号" << " " << "城市介绍" << endl;
 	for (int i = 0; i < list.Size(); i++) {
-		cout << list[i].getName() << " "<<list[i].getId()<<" "<<list[i].getIntroduce();
+		cout << list[i].getName() << " " << list[i].getId() << " " << list[i].getIntroduce();
 		cout << endl;
 	}
-	
+
 }
 
 void Map::path_Show() {
 	fromfilePath();
-	cout << "出发站   " << "终点站  " << "列车号  " << "出发时间  " << "到站时间   " << endl;
+	cout << "列车号  " << "出发站   " << "终点站  " << "出发时间  " << "到站时间   " << endl;
 	for (int i = 0; i < edges.Size(); i++) {
 		int start = edges[i].getStart_station();
 		int end = edges[i].getEnd_station();
 		for (int j = 0; j < edges[i].getTrainNumber(); j++) {
-			cout << list[start-1].getName() << "  " << list[end-1].getName() << "  ";
-			cout << (edges[i].getTrain())[j].getTrain_name()<<"  "<< edges[i].getTrain()[j].getStart_time() << " "<< edges[i].getTrain()[j].getEnd_time()<<endl;
-		}	
+			cout << edges[i].getTrain()[j].getTrain_name() << "  " << list[start - 1].getName() << "  " << list[end - 1].getName() << "  ";
+			cout << edges[i].getTrain()[j].getStart_time() << " " << edges[i].getTrain()[j].getEnd_time() << endl;
+		}
 	}
 }
-
+void Map::Message_Show()
+{
+	fromfileMessage();
+	cout << "游客名  " << "城市   " << "留言  " << endl;
+	for (int i = 0; i < visitors.Size(); i++)
+	{
+		cout << visitors[i].getName() << " " << visitors[i].getStationName() << " " << visitors[i].getMessage()<<endl;
+    }
+}
 void Map::fromfileStation() {
 	fstream ifile;
 	ifile.open("Station.txt");
@@ -343,6 +366,43 @@ void  Map::infilePath() {
 	}
 }
 
+void Map::fromfileMessage() {
+	fstream ifile;
+	ifile.open("Message.txt");
+	if (!ifile)  cout << "源文件丢失！" << endl;
+	else {
+		if (ifile.eof())
+			ifile.get();
+		Visitor visitor;
+		string name, stationName,message;
+		while (!ifile.eof()) {
+			ifile >> name >> stationName >> message;
+			visitor.setName(name);
+			visitor.setStationName(stationName);
+			visitor.setMessage(message);
+			visitors.Insert(visitor, visitors.Size());
+		}
+		}
+		ifile.close();
+}
+void  Map::infileMessage() {
+	fclose(fopen("Message.txt", "w"));
+	fstream ifile;
+	ifile.open("Message.txt");
+	if (!ifile)  cout << "源文件丢失！" << endl;
+	else {
+		int i = 0;
+		while (i<visitors.Size()) {
+			if (i == visitors.Size() - 1) {
+				ifile << visitors[i].getName() << " " << visitors[i].getStationName() << " " << visitors[i].getMessage();
+				break;
+			}
+			ifile << visitors[i].getName() << " " << visitors[i].getStationName() << " " << visitors[i].getMessage() << endl;
+			i++;
+		}
+		ifile.close();
+	}
+}
 void Map::voluation_Length() {
 	for (int i = 0; i < edges.Size(); i++) {
 		Edges[edges[i].getStart_station()][edges[i].getEnd_station()] = edges[i].getLength();
@@ -369,4 +429,9 @@ int Map::toId(string name) {
 		}
 	}
 	return IPOSSIBLE_NUM;
+}
+
+SeqList<Visitor> Map::getList()
+{
+	return visitors;
 }
