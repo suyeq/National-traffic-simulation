@@ -3,13 +3,14 @@
 #include<iostream>
 #include<fstream>
 #include <cstdlib>
+#include<algorithm>
 #include"SeqList.h"
 #include"Station.h"
 #include"Stack.h"
 #include"VisitorMessage.h"
 #include"Path.h"
 #define MAXNUM 100
-#define IPOSSIBLE_NUM 9999999
+#define IPOSSIBLE_NUM 9999
 class Map
 {
 private:
@@ -57,11 +58,14 @@ public:
 	void voluation_Time();//时间，权值
 	void voluation_visited();
 	void DFS(int start,int end);
-	void Path_All();
 	void  Short_Floyd();
 	void show_ShortPath(string name1,string name2);
+	void OptimumPath();//多个城市最优路径
+	double weightSum(int weight[],int num);
 	int toId(string name);//将名字转换为对应的城市id
-	string toName(int id);
+	void toShowTrainLength(int id1,int id2);
+	void DirecInsert(int *array, int size);//插排
+//	void toShowTrainTime(int id);
 	friend istream& operator>>(istream &is, Station &station);
 	friend istream& operator>>(istream &is, Visitor &visitor);
 	friend istream& operator>>(istream &is, PathTrain &pathnode);
@@ -209,6 +213,7 @@ void Map::deletePath(int start, int end)
 		cout << "该路线不存在！！" << endl;
 	}
 }
+
 void Map::addMessage()
 {
 	Visitor visitor;
@@ -218,6 +223,7 @@ void Map::addMessage()
 	infileMessage();
 	cout << "增加成功！！！"<<endl;
 }
+
 istream& operator>>(istream &is, Station &station)
 {
 	string name, introduce;
@@ -461,13 +467,23 @@ int Map::toId(string name) {
 	}
 	return -1;
 }
-string Map::toName(int id) {
+void Map::toShowTrainLength(int id1,int id2) {
 	for (int i = 0; i < list.Size(); i++) {
-		if (list[i].getId() == (id+1)) {
-			return list[i].getName();
+		if (list[i].getId() == (id1 + 1)) {
+			cout << list[i].getName() << "-->";
 		}
 	}
-	return NULL;
+	for (int i = 0; i < list.Size(); i++) {
+		if (list[i].getId() == (id2+1)) {
+			cout << list[i].getName() << " ";
+		}
+	}
+	for (int i = 0; i < edges.Size(); i++) {
+		if (edges[i].getStart_station() == (id1 + 1) && edges[i].getEnd_station() == (id2 + 1)) {
+			cout << edges[i].getTrain()[0].getTrain_name() << " " << edges[i].getLength()<<"km"<<endl;
+		}
+	}
+	
 }
 
 SeqList<Visitor> Map::getList()
@@ -475,32 +491,28 @@ SeqList<Visitor> Map::getList()
 	return visitors;
 }
 
-void Map::Path_All()
-{
-	cout << "请输入要查询的两座城市：";
-	string name1, name2;
-	cin >> name1 >> name2;
-	
-}
 
-void Map::DFS(int start,int end)
+
+void Map::DFS(int start,int end)//深搜入栈查询所有路径
 {
 	visited[start] = true;
 	stack.Push(list[start]);
-	int flag = 0;
 	for (int j = 0; j < list.Size(); j++) {
-		if (j== end) {
-			for (int i; i < stack.Size(); i++) {
-				cout << stack.Pop().getName() << "-->";
+		if (start== end) {
+			cout << "path:" << endl;
+			for (int i=0; i < stack.Size()-1; i++) {
+				toShowTrainLength(stack[i].getId() - 1, stack[i + 1].getId() - 1);
 			}
+			stack.Pop();
+			visited[start] = false;
 			break;
 		}
-		if ((Edges[j][end] > 0&& Edges[j][end]<100) && !visited[j]) {
+		if ((Edges[start][j] > 0 && Edges[start][j]<100) && !visited[j]) {
 			DFS(j,end);
-			flag = 1;
 		}
-		if (j == list.Size() - 1 && flag == 0) {
+		if (j == list.Size() - 1 ) {
 		    stack.Pop();
+			visited[start] = false;
 		}
 	}
 }
@@ -527,12 +539,85 @@ void Map::Short_Floyd()
 void Map::show_ShortPath(string name1,string name2) {//找完需重新赋值
 	        int i = toId(name1);
 			int j = toId(name2);
-			cout << name1<< "--" << name2 << "    用时/距离为：" << ShortPathnum[i][j]<<endl;
+			cout << name1<< "-->" << name2 << " 用时/距离为：" << ShortPathnum[i][j]<<endl;
 			int k = ShortPath[i][j];
-			cout << "path:" << name1;
+			cout << "path:" <<endl;
 			while (k!= j) {
-				cout << "-->" <<toName(k);
+				toShowTrainLength(i, k);
+				i = k;
 				k = ShortPath[k][j];
 			}
-			cout << "-->" << name2 << endl;
+			toShowTrainLength(i,j);
+}
+
+void Map::OptimumPath() {
+	voluation_Length();
+	int length[20];
+	string name[20];
+	cout << "请输入几个城市：";
+	int number;
+	cin >> number;
+	cout << "请输入你要到达的城市：";
+	for (int i = 0; i < number; i++) {
+		cin >> name[i];
+	}
+	for (int i = 0; i < number; i++) {
+		for (int j = 0; j < list.Size(); j++) {
+			if (name[i] == list[j].getName()) {
+				length[i] = list[j].getId();
+			}
+		}
+	}
+	DirecInsert(length, number);
+	int count = 0;
+	int i = 0;
+	double minWeight = weightSum(length, number);
+	while (next_permutation(length, length + number)) {
+		i++;
+		if (minWeight > weightSum(length, number)) {
+			minWeight = weightSum(length, number);
+			count = i;
+		}
+	}
+    i = 0;
+	if (count == 0) {
+		for (int i = 0; i < number - 1; i++) {
+			toShowTrainLength(length[i] - 1, length[i + 1] - 1);
+		}
+	}
+	else {
+		while (next_permutation(length, length + number)) {
+			i++;
+			if (i == count) {
+				cout << "Path:" << endl;
+				for (int i = 0; i < number - 1; i++) {
+					toShowTrainLength(length[i] - 1, length[i + 1] - 1);
+				}
+			}
+		}
+	}
+	
+}
+
+double Map::weightSum(int weight[],int num) {
+	double sum=0;
+	for (int i = 0; i < num-1; i++) {
+		sum += Edges[weight[i]-1][weight[i+1]-1];
+	}
+	return sum;
+}
+
+void Map::DirecInsert(int *array, int size)
+{
+	int i, j;
+	if (!array) return;
+	for ( i = 1; i<size; i++)
+	{
+		int temp = array[i];
+		for (j = i - 1; j >= 0 && array[j]>temp; j--)
+		{
+			array[j + 1] = array[j];
+		}
+		array[j + 1] = temp;
+	}
 }

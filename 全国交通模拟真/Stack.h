@@ -10,7 +10,8 @@ public:
 	Stack();
 	~Stack(){}
 	void Push(T temp);
-	T Pop();
+	void Pop();
+	T &operator [](int i);
 	int Size();
 };
 template <class T>
@@ -33,18 +34,27 @@ void Stack<T>::Push(T item)
 }
 
 template <class T>
-T Stack<T>:: Pop()
+void Stack<T>:: Pop()
 {
 	if (size == 0)
 	{
 		cout << "顺序表已空无元素可删！" << endl;
 		exit(0);
 	}	
-	return list[size--]; 
+	size--;
 }
 
 template<class T>
 int Stack<T>::Size()
 {
 	return size;
+}
+template<class T>
+T &Stack<T>::operator[](int i) {
+	if (i<0 || i>size) {
+		exit(0);
+	}
+	else {
+		return list[i];
+	}
 }

@@ -23,10 +23,9 @@ void mainLoop()
 		{
 		case 1:map->station_Show(); break;
 		case 2:Path_short(map); break;
-		case 3:(*map).station_Show(); break;
-		case 4:(*map).station_Show(); break;
-		case 5:Message_control(map); break;
-		case 6:Manage(map); break;
+		case 3:map->OptimumPath(); break;
+		case 4:Message_control(map); break;
+		case 5:Manage(map); break;
 		case 0:exit(0);
 		}
 	}
@@ -38,10 +37,9 @@ void Menu()//菜单
 	cout << "             全国交通咨询模拟系统" << endl;
 	cout << "              1、城市信息查询" << endl;
 	cout << "              2、两城市的路径查询" << endl;
-	cout << "              3、两城市所有访问路径查询" << endl;
-	cout << "              4、多城市访问最优路径查询" << endl;
-	cout << "              5、游客留言栏" << endl;
-	cout << "              6、管理员登入" << endl;
+	cout << "              3、多城市访问最优路径查询" << endl;
+	cout << "              4、游客留言栏" << endl;
+	cout << "              5、管理员登入" << endl;
 	cout << "              0、退出系统" << endl;
 	cout << " —————————————————————" << endl;
 }
@@ -114,10 +112,18 @@ void Message_control(Map *map) {
 }
 void Path_short(Map *map) {
 	map->voluation_Length();
-	map->Short_Floyd();
+	cout << "请做出选择:1.两城市最短路径查询   2.两城市所有路径查询"<<endl;
+	int choice;
+	cin >>choice ;
 	cout << "请输入要查询的两座城市：";
 	string name1, name2;
 	cin >> name1 >> name2;
-	map->show_ShortPath(name1,name2);
+	switch (choice) {
+	case 1:map->Short_Floyd();
+		map->show_ShortPath(name1, name2); break;
+	case 2:map->DFS(map->toId(name1), map->toId(name2)); break;
+	}
+	
 }
+
  
