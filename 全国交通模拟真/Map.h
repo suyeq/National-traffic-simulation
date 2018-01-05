@@ -17,14 +17,16 @@ private:
 	Map() {};
 	Map(int num);
 	~Map();
+	//int offset = 1;
 	SeqList<Station> list;
 	SeqList<Path> edges;
 	SeqList<Visitor> visitors;
+	Stack<Station> stack;
 	double Edges[MAXNUM][MAXNUM];
 	bool visited[MAXNUM];
-	Stack<Station> stack;
 	int ShortPath[MAXNUM][MAXNUM];
 	double ShortPathnum[MAXNUM][MAXNUM];
+	int position[MAXNUM];
 	static Map *map;
 
 public:
@@ -37,11 +39,11 @@ public:
 		return edges.Size();
 	}
 	static Map* getInstance();
-	SeqList<Visitor> getList();
+	SeqList<Station> getList();
 	bool isStation(Station st);//判断车站是否存在
 	bool isEdges(Path pa);//判断路是否存在
 	void addStation();
-	void deleteStation(int i);
+	//void deleteStation(int i);
 	void addPath();
 	void deletePath(int start,int end);
 	void addMessage();
@@ -57,15 +59,16 @@ public:
 	void voluation_Length();//路程，权值,赋值
 	void voluation_Time();//时间，权值
 	void voluation_visited();
-	void DFS(int start,int end);
+	void DFS(int start,int end,int &temp);
 	void  Short_Floyd();
 	void show_ShortPath(string name1,string name2);
+	void show_ShowTime(string name1, string name2);
 	void OptimumPath();//多个城市最优路径
 	double weightSum(int weight[],int num);
 	int toId(string name);//将名字转换为对应的城市id
 	void toShowTrainLength(int id1,int id2);
 	void DirecInsert(int *array, int size);//插排
-//	void toShowTrainTime(int id);
+	void toShowTrainTime(int id1, int id2);
 	friend istream& operator>>(istream &is, Station &station);
 	friend istream& operator>>(istream &is, Visitor &visitor);
 	friend istream& operator>>(istream &is, PathTrain &pathnode);
@@ -74,9 +77,6 @@ Map* Map::getInstance() {
 	if (map == NULL) {
 		map = new Map(100);
 	}
-	map->fromfileStation();
-	map->fromfilePath();
-	map->fromfileMessage();
 	map->voluation_visited();
 	return map;
 }
@@ -139,8 +139,9 @@ bool Map::isEdges(Path pa)
 void Map::addStation()
 {
 	Station st;
-	cout << "请输入车站的站名，车站的序号,车站的介绍" << endl;
+	cout << "请输入车站的站名,车站的介绍" << endl;
 	cin >> st;
+	st.setId(list[list.Size()].getId() + 1);
 	if (isStation(st))
 	{
 		list.Insert(st, list.Size());
@@ -150,20 +151,32 @@ void Map::addStation()
 	else {
 		cout << "该车站已存在，增加失败!!!" << endl;
 	}
+	//fromfileStation();
 }
 
-void Map::deleteStation(int i)
+/*void Map::deleteStation(int i)
 {
 	if (i<0 || i>list.Size()) {
 		cout << "该车站不存在!!!" << endl;
 	}
 	else {
+		for (int j = 0; j < edges.Size(); j++) {
+			if (i + 1 == edges[j].getStart_station()) {
+				deletePath(edges[j].getStart_station()-1, edges[j].getEnd_station()- 1);
+				j--;
+			}
+			if (i + 1 == edges[j].getEnd_station()) {
+				deletePath(edges[j].getStart_station() - 1, edges[j].getEnd_station() - 1);
+				j--;
+			}
+		}
 		list.Delete(i);
+		//offset++;
 		cout << "删除成功！！" << endl;
 		infileStation();
 	}
 	
-}
+}*/
 
 void Map::addPath()
 {
@@ -193,11 +206,12 @@ if (isEdges(path)) {
 else {
 	cout << "该路线已存在，增加失败!!!" << endl;
 }
+//fromfilePath();
 }
 
 void Map::deletePath(int start, int end)
 {
-	int temp;
+	int temp=-1;
 	for (int i = 0; i < edges.Size(); i++) {
 		if (edges[i].getStart_station() == (start + 1) && edges[i].getEnd_station() == (end + 1)) {
 			temp = i;
@@ -212,6 +226,7 @@ void Map::deletePath(int start, int end)
 	else {
 		cout << "该路线不存在！！" << endl;
 	}
+	//fromfilePath();
 }
 
 void Map::addMessage()
@@ -227,9 +242,9 @@ void Map::addMessage()
 istream& operator>>(istream &is, Station &station)
 {
 	string name, introduce;
-	int id;
-	is >> name >> id >> introduce;
-	station.setId(id);
+	//int id;
+	is >> name >> introduce;
+	//station.setId(id);
 	station.setName(name);
 	station.setIntroduce(introduce);
 	return is;
@@ -255,34 +270,34 @@ istream& operator>>(istream &is, PathTrain& pathnode) {
 }
 
 void Map::station_Show() {
-	fromfileStation();
-	cout << "城市名字" << " " << "城市代号" << " " << "城市介绍" << endl;
+	//fromfileStation();
+	cout << "城市名字" << "    " << "城市代号" << "    " << "城市介绍" << endl;
 	for (int i = 0; i < list.Size(); i++) {
-		cout << list[i].getName() << " " << list[i].getId() << " " << list[i].getIntroduce();
+		cout << list[i].getName() << "          " << list[i].getId() << "       " << list[i].getIntroduce();
 		cout << endl;
 	}
 
 }
 
 void Map::path_Show() {
-	fromfilePath();
+	//fromfilePath();
 	cout << "列车号  " << "出发站   " << "终点站  " << "出发时间  " << "到站时间   " << endl;
 	for (int i = 0; i < edges.Size(); i++) {
 		int start = edges[i].getStart_station();
 		int end = edges[i].getEnd_station();
 		for (int j = 0; j < edges[i].getTrainNumber(); j++) {
-			cout << edges[i].getTrain()[j].getTrain_name() << "  " << list[start - 1].getName() << "  " << list[end - 1].getName() << "  ";
-			cout << edges[i].getTrain()[j].getStart_time() << " " << edges[i].getTrain()[j].getEnd_time() << endl;
+			cout << edges[i].getTrain()[j].getTrain_name() << "    " << list[start - 1].getName() << "     " << list[end - 1].getName() << "    ";
+			cout << edges[i].getTrain()[j].getStart_time() << "   " << edges[i].getTrain()[j].getEnd_time() << endl;
 		}
 	}
 }
 void Map::Message_Show()
 {
-	fromfileMessage();
-	cout << "游客名  " << "城市   " << "留言  " << endl;
+	//fromfileMessage();
+	cout << "游客名     " << "   城市    " << "     留言  " << endl;
 	for (int i = 0; i < visitors.Size(); i++)
 	{
-		cout << visitors[i].getName() << " " << visitors[i].getStationName() << " " << visitors[i].getMessage()<<endl;
+		cout << visitors[i].getName() << "        " << visitors[i].getStationName() << "     " << visitors[i].getMessage()<<endl;
     }
 }
 void Map::fromfileStation() {
@@ -435,20 +450,23 @@ void  Map::infileMessage() {
 	}
 }
 void Map::voluation_Length() {
+	//fromfilePath();
 	for (int i = 0; i < edges.Size(); i++) {
 		Edges[edges[i].getStart_station()-1][edges[i].getEnd_station()-1] = edges[i].getLength();
 	}
 }
 
 void Map::voluation_Time() {
+	//fromfilePath();
 	for (int i = 0; i < edges.Size(); i++) {
 		double sumtime=edges[i].getTrain()[0].getSum_time();
 		for (int j = 0; j < edges[i].getTrainNumber(); j++) {
 			if (edges[i].getTrain()[j].getSum_time() < sumtime) {
 				sumtime = edges[i].getTrain()[j].getSum_time();
+				position[edges[i].getStart_station()] = j;
 			}
 		}
-		Edges[edges[i].getStart_station()][edges[i].getEnd_station()] = sumtime;
+		Edges[edges[i].getStart_station()-1][edges[i].getEnd_station()-1] = sumtime;
 	}
 
 }
@@ -475,40 +493,86 @@ void Map::toShowTrainLength(int id1,int id2) {
 	}
 	for (int i = 0; i < list.Size(); i++) {
 		if (list[i].getId() == (id2+1)) {
-			cout << list[i].getName() << " ";
+			cout << list[i].getName() << "     ";
 		}
 	}
 	for (int i = 0; i < edges.Size(); i++) {
 		if (edges[i].getStart_station() == (id1 + 1) && edges[i].getEnd_station() == (id2 + 1)) {
-			cout << edges[i].getTrain()[0].getTrain_name() << " " << edges[i].getLength()<<"km"<<endl;
+			cout << edges[i].getTrain()[0].getTrain_name() << "       " << edges[i].getLength()<<"km"<<endl;
 		}
 	}
 	
 }
 
-SeqList<Visitor> Map::getList()
+void Map::toShowTrainTime(int id1, int id2) {
+	for (int i = 0; i < edges.Size(); i++) {
+		if (edges[i].getStart_station() == (id1 + 1) && edges[i].getEnd_station() == (id2 + 1)) {
+			cout << edges[i].getTrain()[position[id1 + 1]].getStart_time() << "-" << edges[i].getTrain()[position[id1 + 1]].getEnd_time()<<"     ";
+		}
+	}
+	for (int i = 0; i < list.Size(); i++) {
+		if (list[i].getId() == (id1 + 1)) {
+			cout << list[i].getName() << "-->";
+		}
+	}
+	for (int i = 0; i < list.Size(); i++) {
+		if (list[i].getId() == (id2 + 1)) {
+			cout << list[i].getName() << "     ";
+		}
+	}
+	for (int i = 0; i < edges.Size(); i++) {
+		if (edges[i].getStart_station() == (id1 + 1) && edges[i].getEnd_station() == (id2 + 1)) {
+			cout << edges[i].getTrain()[position[id1+1]].getTrain_name() << "       " << edges[i].getTrain()[position[id1 + 1]].getSum_time() << "h" << endl;
+		}
+	}
+}
+
+void Map::show_ShowTime(string name1, string name2) {
+	int i = toId(name1);
+	int j = toId(name2);
+	if (ShortPathnum[i][j] > 1000) {
+		cout << "该路线不存在！！！" << endl;
+	}
+	else {
+		cout << name1 << "-->" << name2 << " 用时：" << ShortPathnum[i][j]<<"h" << endl;
+		int k = ShortPath[i][j];
+		cout <<"     时间     "<< "    Path       " << "列车号     " << "用时 " << endl;
+		while (k != j) {
+			toShowTrainTime(i, k);
+			i = k;
+			k = ShortPath[k][j];
+		}
+		toShowTrainTime(i, j);
+	}
+}
+
+
+SeqList<Station> Map::getList()
 {
-	return visitors;
+	return list;
 }
 
 
 
-void Map::DFS(int start,int end)//深搜入栈查询所有路径
+void Map::DFS(int start,int end,int &temp)//深搜入栈查询所有路径
 {
 	visited[start] = true;
 	stack.Push(list[start]);
 	for (int j = 0; j < list.Size(); j++) {
 		if (start== end) {
-			cout << "path:" << endl;
+			cout << "    Path       " << "列车号     " << "距离/用时 " << endl;
 			for (int i=0; i < stack.Size()-1; i++) {
 				toShowTrainLength(stack[i].getId() - 1, stack[i + 1].getId() - 1);
+			}
+			if (temp == 0) {
+				temp = 1;
 			}
 			stack.Pop();
 			visited[start] = false;
 			break;
 		}
 		if ((Edges[start][j] > 0 && Edges[start][j]<100) && !visited[j]) {
-			DFS(j,end);
+			DFS(j,end,temp);
 		}
 		if (j == list.Size() - 1 ) {
 		    stack.Pop();
@@ -539,25 +603,30 @@ void Map::Short_Floyd()
 void Map::show_ShortPath(string name1,string name2) {//找完需重新赋值
 	        int i = toId(name1);
 			int j = toId(name2);
-			cout << name1<< "-->" << name2 << " 用时/距离为：" << ShortPathnum[i][j]<<endl;
-			int k = ShortPath[i][j];
-			cout << "path:" <<endl;
-			while (k!= j) {
-				toShowTrainLength(i, k);
-				i = k;
-				k = ShortPath[k][j];
+			if (ShortPathnum[i][j] > 1000) {
+				cout << "该路线不存在！！！" << endl;
 			}
-			toShowTrainLength(i,j);
+			else {
+				cout << name1 << "-->" << name2 << " 距离为：" << ShortPathnum[i][j] <<"km"<< endl;
+				int k = ShortPath[i][j];
+				cout << "    Path       " << "列车号     " << "距离 " << endl;
+				while (k != j) {
+					toShowTrainLength(i, k);
+					i = k;
+					k = ShortPath[k][j];
+				}
+				toShowTrainLength(i, j);
+			}
 }
 
 void Map::OptimumPath() {
 	voluation_Length();
 	int length[20];
 	string name[20];
-	cout << "请输入几个城市：";
+	cout << "请输入几个城市:";
 	int number;
 	cin >> number;
-	cout << "请输入你要到达的城市：";
+	cout << "请输入你要到达的城市:";
 	for (int i = 0; i < number; i++) {
 		cin >> name[i];
 	}
@@ -580,23 +649,28 @@ void Map::OptimumPath() {
 		}
 	}
     i = 0;
-	if (count == 0) {
-		for (int i = 0; i < number - 1; i++) {
-			toShowTrainLength(length[i] - 1, length[i + 1] - 1);
-		}
+	if (minWeight > 1000) {
+		cout << "不存在这样的路线！！！" << endl;
 	}
 	else {
-		while (next_permutation(length, length + number)) {
-			i++;
-			if (i == count) {
-				cout << "Path:" << endl;
-				for (int i = 0; i < number - 1; i++) {
-					toShowTrainLength(length[i] - 1, length[i + 1] - 1);
+		if (count == 0) {
+			cout << "    Path       " << "列车号     " << "距离 " << endl;
+			for (int i = 0; i < number - 1; i++) {
+				toShowTrainLength(length[i] - 1, length[i + 1] - 1);
+			}
+		}
+		else {
+			while (next_permutation(length, length + number)) {
+				i++;
+				if (i == count) {
+					cout << "    Path       " << "列车号     " << "距离/用时 " << endl;
+					for (int i = 0; i < number - 1; i++) {
+						toShowTrainLength(length[i] - 1, length[i + 1] - 1);
+					}
 				}
 			}
 		}
 	}
-	
 }
 
 double Map::weightSum(int weight[],int num) {

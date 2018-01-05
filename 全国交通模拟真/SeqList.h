@@ -60,11 +60,13 @@ void SeqList<T>::Insert(T item, int i)	//插入
 	if (size == maxSize)
 	{
 		cout << "顺序表已满无法插入！" << endl;
+		system("pause");
 		exit(0);
 	}
 	if (i < 0 || i > size)					//参数正确与否判断
 	{
 		cout << "参数i越界出错!" << endl;
+		system("pause");
 		exit(0);
 	}
 
@@ -80,11 +82,13 @@ void SeqList<T>::Delete(const int i)				//删除
 	if (size == 0)
 	{
 		cout << "顺序表已空无元素可删！" << endl;
+		system("pause");
 		exit(0);
 	}
 	if (i < 0 || i > size - 1)			//参数正确与否判断
 	{
 		cout << "参数i越界出错!" << endl;
+		system("pause");
 		exit(0);
 	}
 
@@ -104,6 +108,7 @@ T & SeqList<T>::GetData(int i) const	//取数据元素
 	if (i < 0 || i > size - 1)			//参数正确与否判断
 	{
 		cout << "参数i越界出错!" << endl;
+		system("pause");
 		exit(0);
 	}
 	return list[i];						//返回取到的元素

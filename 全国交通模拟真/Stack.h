@@ -52,6 +52,8 @@ int Stack<T>::Size()
 template<class T>
 T &Stack<T>::operator[](int i) {
 	if (i<0 || i>size) {
+		cout << "参数越界出错！！" << endl;
+		system("pause");
 		exit(0);
 	}
 	else {
