@@ -173,12 +173,18 @@ void SerchStation(Map *map)
 	cout << "请输入城市名字:";
 	string name;
 	cin >> name;
-	cout << "城市名字" << "    " << "城市代号" << "    " << "城市介绍" << endl;
-	for (int i = 0; i < map->getList().Size(); i++) {
-		if (map->getList()[i].getName() == name) {
-			cout << map->getList()[i].getName() << "         " << map->getList()[i].getId() << "         "
-				<< map->getList()[i].getIntroduce() << endl;
-			break;
+	if (map->isStation(name)) {
+		cout << "城市名字" << "    " << "城市代号" << "    " << "城市介绍" << endl;
+		for (int i = 0; i < map->getList().Size(); i++) {
+			if (map->getList()[i].getName() == name) {
+				cout << map->getList()[i].getName() << "         " << map->getList()[i].getId() << "         "
+					<< map->getList()[i].getIntroduce() << endl;
+				break;
+			}
 		}
 	}
+	else {
+		cout << "该城市不存在！！！" << endl;
+	}
+	
 }

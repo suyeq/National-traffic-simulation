@@ -41,6 +41,7 @@ public:
 	static Map* getInstance();
 	SeqList<Station> getList();
 	bool isStation(Station st);//判断车站是否存在
+	bool isStation(string name);
 	bool isEdges(Path pa);//判断路是否存在
 	void addStation();
 	//void deleteStation(int i);
@@ -67,6 +68,7 @@ public:
 	double weightSum(int weight[],int num);
 	int toId(string name);//将名字转换为对应的城市id
 	void toShowTrainLength(int id1,int id2);
+	//Station* toStation(string name);
 	void DirecInsert(int *array, int size);//插排
 	void toShowTrainTime(int id1, int id2);
 	friend istream& operator>>(istream &is, Station &station);
@@ -124,6 +126,14 @@ bool Map::isStation(Station st)
 	return true;
 }
 
+bool Map ::isStation(string name) {
+	for (int i = 0; i < list.Size(); i++) {
+		if (name == list[i].getName()) {
+			return true;
+		}
+	}
+	return false;
+}
 bool Map::isEdges(Path pa)
 {
 	for (int i = 0; i < edges.Size(); i++)
@@ -141,7 +151,7 @@ void Map::addStation()
 	Station st;
 	cout << "请输入车站的站名,车站的介绍" << endl;
 	cin >> st;
-	st.setId(list[list.Size()].getId() + 1);
+	st.setId(list[list.Size()-1].getId() + 1);
 	if (isStation(st))
 	{
 		list.Insert(st, list.Size());

@@ -8,7 +8,7 @@ private:
 	int maxSize;
 public:
 	Stack();
-	~Stack(){}
+	~Stack();
 	void Push(T temp);
 	void Pop();
 	T &operator [](int i);
@@ -20,7 +20,10 @@ Stack<T>::Stack(){
 	size = 0;
 	list = new T[maxSize];
 }
-
+template <class T>
+Stack<T>::~Stack() {
+	//delete[] T;
+}
 template <class T>
 void Stack<T>::Push(T item)
 {
