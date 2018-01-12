@@ -1,5 +1,5 @@
 #pragma once
-#pragma warning(disable:4996)
+#pragma warning(disable:4996)//地图
 #include<iostream>
 #include<fstream>
 #include <cstdlib>
@@ -22,6 +22,7 @@ private:
 	SeqList<Path> edges;
 	SeqList<Visitor> visitors;
 	Stack<Station> stack;
+	int Maxnum;
 	double Edges[MAXNUM][MAXNUM];
 	bool visited[MAXNUM];
 	int ShortPath[MAXNUM][MAXNUM];
@@ -43,6 +44,7 @@ public:
 	bool isStation(Station st);//判断车站是否存在
 	bool isStation(string name);
 	bool isEdges(Path pa);//判断路是否存在
+	void isClear();
 	void addStation();
 	//void deleteStation(int i);
 	void addPath();
@@ -60,7 +62,7 @@ public:
 	void voluation_Length();//路程，权值,赋值
 	void voluation_Time();//时间，权值
 	void voluation_visited();
-	void DFS(int start,int end,int &temp);
+	void DFS(int start,int end,int &temp,int &count);
 	void  Short_Floyd();
 	void show_ShortPath(string name1,string name2);
 	void show_ShowTime(string name1, string name2);
@@ -89,6 +91,7 @@ Map::~Map() {
 }
 Map::Map(int num)
 {
+	Maxnum = num;
 	for (int i = 0; i < num; i++)
 	{
 		for (int j = 0; j < num; j++)
@@ -125,7 +128,31 @@ bool Map::isStation(Station st)
 	}
 	return true;
 }
-
+void Map::isClear() {
+	for (int i = 0; i < Maxnum; i++)
+	{
+		for (int j = 0; j < Maxnum; j++)
+		{
+			if (i == j)
+			{
+				Edges[i][j] = 0;
+			}
+			else {
+				Edges[i][j] = IPOSSIBLE_NUM;
+			}
+		}
+	}
+	for (int i = 0; i < MAXNUM; i++) {
+		for (int j = 0; j < MAXNUM; j++) {
+			ShortPathnum[i][j] = 0;
+		}
+	}
+	for (int i = 0; i < MAXNUM; i++) {
+		for (int j = 0; j < MAXNUM; j++) {
+			ShortPath[i][j] = 0;
+		}
+	}
+}
 bool Map ::isStation(string name) {
 	for (int i = 0; i < list.Size(); i++) {
 		if (name == list[i].getName()) {
@@ -564,7 +591,7 @@ SeqList<Station> Map::getList()
 
 
 
-void Map::DFS(int start,int end,int &temp)//深搜入栈查询所有路径
+void Map::DFS(int start,int end,int &temp,int &count)//深搜入栈查询所有路径
 {
 	visited[start] = true;
 	stack.Push(list[start]);
@@ -579,10 +606,11 @@ void Map::DFS(int start,int end,int &temp)//深搜入栈查询所有路径
 			}
 			stack.Pop();
 			visited[start] = false;
+			count++;
 			break;
 		}
 		if ((Edges[start][j] > 0 && Edges[start][j]<100) && !visited[j]) {
-			DFS(j,end,temp);
+			DFS(j,end,temp,count);
 		}
 		if (j == list.Size() - 1 ) {
 		    stack.Pop();

@@ -2,7 +2,7 @@
 #include<iostream>
 #include<string>
 using namespace std;
-class PathTrain
+class PathTrain//»ð³µÐÅÏ¢
 {
 private:
 	string train_name;

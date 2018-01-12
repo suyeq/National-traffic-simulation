@@ -1,6 +1,6 @@
 #pragma once
 #include"PathTrain.h"
-class Path
+class Path//路线信息
 {
 private:
 	int start_station;

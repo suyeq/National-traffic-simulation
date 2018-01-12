@@ -2,7 +2,7 @@
 #include<iostream>
 #include<string>
 using namespace std;
-class Station
+class Station//≥µ’æ–≈œ¢
 {
 private:
 string name;

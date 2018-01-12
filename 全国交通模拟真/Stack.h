@@ -1,6 +1,6 @@
 #pragma once
 template <class T>
-class Stack
+class Stack//模板栈
 {
 private:
 	T *list;
@@ -30,7 +30,8 @@ void Stack<T>::Push(T item)
 	if (size == maxSize)
 	{
 		cout << "顺序表已满无法插入！" << endl;
-		exit(0);
+		//exit(0);
+		return;
 	}
 	list[size] = item;	                
 	size++;	
@@ -42,7 +43,8 @@ void Stack<T>:: Pop()
 	if (size == 0)
 	{
 		cout << "顺序表已空无元素可删！" << endl;
-		exit(0);
+		//exit(0);
+		return;
 	}	
 	size--;
 }
@@ -56,7 +58,7 @@ template<class T>
 T &Stack<T>::operator[](int i) {
 	if (i<0 || i>size) {
 		cout << "参数越界出错！！" << endl;
-		system("pause");
+		//system("pause");
 		exit(0);
 	}
 	else {

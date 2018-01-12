@@ -2,7 +2,7 @@
 #include"SeqList.h"
 #include<iostream>
 using namespace std;
-class Visitor
+class Visitor//参观者信息
 {
 private:
 	string name;

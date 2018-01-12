@@ -1,6 +1,6 @@
 #pragma once
 template <class T>
-class SeqList
+class SeqList//顺序表
 {
 protected:
 	T *list;							//数组
@@ -16,8 +16,8 @@ public:
 	void Delete(const int i);			//删除
 	T & GetData(int i)const;			//取数据元素
 	T &operator [](int i);           //重载[]
-	void Cleardate();//清空
-	SeqList<T>& operator=(SeqList<T>& temp);
+	//void Cleardate();//清空
+	SeqList<T>& operator=(SeqList<T>& temp);//重载=
 };
 template <class T>
 T &SeqList<T>::operator[](int i) {
@@ -60,8 +60,9 @@ void SeqList<T>::Insert(T item, int i)	//插入
 	if (size == maxSize)
 	{
 		cout << "顺序表已满无法插入！" << endl;
-		system("pause");
-		exit(0);
+		return;
+		//system("pause");
+		//exit(0);
 	}
 	if (i < 0 || i > size)					//参数正确与否判断
 	{
@@ -82,14 +83,16 @@ void SeqList<T>::Delete(const int i)				//删除
 	if (size == 0)
 	{
 		cout << "顺序表已空无元素可删！" << endl;
-		system("pause");
-		exit(0);
+		//system("pause");
+		//exit(0);
+		return;
 	}
 	if (i < 0 || i > size - 1)			//参数正确与否判断
 	{
 		cout << "参数i越界出错!" << endl;
-		system("pause");
-		exit(0);
+		//system("pause");
+		//exit(0);
+		return;
 	}
 
 	//T x = list[i];				//取到要删除的元素
@@ -129,8 +132,8 @@ template<class T>
 		return *this;
 	}
 }
-template<class T>
-void SeqList<T>::Cleardate() {
+/*template<class T>
+void SeqList<T>::Cleardate() {//清空
 	delete[] list;
 	size = 0;
-}
+}*/

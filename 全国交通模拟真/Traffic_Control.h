@@ -1,6 +1,6 @@
 #pragma once
 #include<Windows.h>
-#include"Map.h"
+#include"Map.h"//控制
 Map* Map::map = NULL;
 void mainLoop();
 void Menu();
@@ -22,6 +22,7 @@ void mainLoop()
 	while (true)
 	{
 		Menu();
+		map->isClear();
 		int choice;
 		cout << "请输入你的选择:";
 		cin >> choice;
@@ -74,31 +75,40 @@ bool Enter()//登入
 
 void Manage(Map *map)//管理员操作
 {
-	if (Enter()) {
-		cout << " —————————————————————" << endl;
-		cout << "             全国交通咨询管理员操作" << endl;
-		cout << "              1、增加城市" << endl;
-		//cout << "              2、删除城市" << endl;
-		cout << "              2、增加路线" << endl;
-		cout << "              3、删除路线" << endl;
-		//cout << "              5、增加交通工具" << endl;
-	   //	cout << "              6、增加留言" << endl;
-		cout << "              0、退出系统" << endl;
-		cout << " —————————————————————" << endl;
-		int choice;
-		cout << "请输入你的选择:" << endl;
-		cin >> choice;
-		switch (choice) {
-		case 1:map->addStation(); break;
-		//case 2:DeleteStation(map); break;
-		case 2:map->addPath(); break;
-		case 3:DeletePath(map); break;
-		//case 5:break;
-	//	case 6:(*map).addMessage();
-		case 0:break;
-		default:break;
+	
+		if (Enter()) {
+			while (true) {
+			cout << " —————————————————————" << endl;
+			cout << "             全国交通咨询管理员操作" << endl;
+			cout << "              1、增加城市" << endl;
+			//cout << "              2、删除城市" << endl;
+			cout << "              2、增加路线" << endl;
+			cout << "              3、删除路线" << endl;
+			//cout << "              5、增加交通工具" << endl;
+			//	cout << "              6、增加留言" << endl;
+			cout << "              0、退出系统" << endl;
+			cout << " —————————————————————" << endl;
+			int choice;
+			cout << "请输入你的选择:" << endl;
+			cin >> choice;
+			switch (choice) {
+			case 1:map->addStation(); break;
+				//case 2:DeleteStation(map); break;
+			case 2:map->addPath(); break;
+			case 3:DeletePath(map); break;
+				//case 5:break;
+				//	case 6:(*map).addMessage();
+			case 0:return;
+			default:break;
+			}
+			cin.get();
+			getchar();
+			system("cls");
 		}
+		
 	}
+		//getchar();
+	
 }
 /*void DeleteStation(Map *map) {
 	cout << "请输入要删除的城市名字:";
@@ -129,7 +139,7 @@ void Path_short(Map *map) {
 	cout << "请输入要查询的两座城市：";
 	string name1, name2;
 	cin >> name1 >> name2;
-	int temp=0;
+	int temp=0,count=0;
 	switch (choice) {
 	case 1: {
 		cout << "请选择哪种属性:1.最短路径    2.最短时间" << endl;
@@ -148,9 +158,12 @@ void Path_short(Map *map) {
 	    }break;
 	case 2:
 		  map->voluation_Length();
-		  map->DFS(map->toId(name1), map->toId(name2),temp);
+		  map->DFS(map->toId(name1), map->toId(name2),temp,count);
 		  if (temp == 0) {
 			  cout << "不存在这样的路线！！！" << endl;
+		  }
+		  else {
+			  cout << name1 << "-->" << name2 << "有" << count << "条路线!!!!" << endl;
 		  }
 		  break;
 	}
